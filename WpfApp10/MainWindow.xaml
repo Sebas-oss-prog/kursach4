@@ -1,0 +1,124 @@
+﻿<Window x:Class="WpfApp10.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="clr-namespace:WpfApp10.Views"
+        Title="Task Planner"
+        Width="1200"
+        Height="800"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResize">
+
+    <Grid>
+
+        <!-- ================= ОСНОВНАЯ СЕТКА ================= -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="240"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ================= ЛЕВАЯ ПАНЕЛЬ ================= -->
+            <Border Background="#2d2d30"
+                    Grid.Column="0">
+
+                <DockPanel Margin="20">
+
+                    <!-- ===== ВЕРХ (МЕНЮ) ===== -->
+                    <StackPanel DockPanel.Dock="Top">
+
+                        <TextBlock Text="Task Planner"
+                                   Foreground="White"
+                                   FontSize="28"
+                                   FontWeight="Bold"
+                                   Margin="0 0 0 20"/>
+
+                        <Button Content="Dashboard"
+                                Height="40"
+                                Margin="0 5"
+                                Command="{Binding NavigateDashboard}"/>
+
+                        <Button Content="Документы"
+                                Height="40"
+                                Margin="0 5"
+                                Command="{Binding NavigateDocuments}"/>
+
+                        <Button Content="Задачи"
+                                Height="40"
+                                Margin="0 5"
+                                Command="{Binding NavigateTasks}"/>
+
+                        <Button Content="Проекты"
+                                Height="40"
+                                Margin="0 5"
+                                Command="{Binding NavigateProjects}"/>
+
+                        <!-- 🆕 КАЛЕНДАРЬ -->
+                        <Button Content="Календарь"
+                                Height="40"
+                                Margin="0 5"
+                                Command="{Binding NavigateCalendar}"/>
+
+                        <Button Content="Аналитика"
+                                Height="40"
+                                Margin="0 5"
+                                Command="{Binding NavigateAnalytics}"/>
+
+                        <Button Content="Уведомления"
+                                Height="40"
+                                Margin="0 5"
+                                Command="{Binding NavigateNotifications}"/>
+
+                    </StackPanel>
+
+                    <!-- ===== НИЗ (ПОЛЬЗОВАТЕЛЬ) ===== -->
+                    <StackPanel DockPanel.Dock="Bottom"
+                                Margin="0 20 0 0">
+
+                        <Separator Margin="0 10"/>
+
+                        <TextBlock Text="{Binding CurrentUser.FullName}"
+                                   Foreground="White"
+                                   FontWeight="Bold"/>
+
+                        <TextBlock Text="{Binding UserRole}"
+                                   Foreground="LightGray"
+                                   FontSize="12"
+                                   Margin="0 0 0 10"/>
+
+                        <Button Content="Выйти"
+                                Height="36"
+                                Command="{Binding LogoutCommand}"/>
+
+                    </StackPanel>
+
+                </DockPanel>
+            </Border>
+
+            <!-- ================= КОНТЕНТ ================= -->
+            <Border Grid.Column="1"
+                    Background="#f3f3f3">
+
+                <ContentControl Content="{Binding CurrentView}" />
+
+            </Border>
+        </Grid>
+
+        <!-- ================= МОДАЛЬНОЕ ОКНО ЛОГИНА ================= -->
+        <Grid Background="#80000000"
+              Visibility="{Binding IsLoginVisible, Converter={StaticResource BoolToVisibility}}"
+              Panel.ZIndex="999">
+
+            <Border Width="420"
+                    Padding="30"
+                    Background="White"
+                    CornerRadius="12"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+
+                <views:LoginView DataContext="{Binding LoginVM}" />
+
+            </Border>
+        </Grid>
+
+    </Grid>
+</Window>

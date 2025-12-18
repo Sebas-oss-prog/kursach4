@@ -1,0 +1,50 @@
+﻿using System.Collections;
+using System.Windows;
+using System.Windows.Controls;
+
+namespace WpfApp10.Helpers
+{
+    public static class ListBoxSelectedItemsBehavior
+    {
+        public static readonly DependencyProperty SelectedItemsProperty =
+            DependencyProperty.RegisterAttached(
+                "SelectedItems",
+                typeof(IList),
+                typeof(ListBoxSelectedItemsBehavior),
+                new PropertyMetadata(null, OnSelectedItemsChanged));
+
+        public static void SetSelectedItems(DependencyObject element, IList value)
+            => element.SetValue(SelectedItemsProperty, value);
+
+        public static IList GetSelectedItems(DependencyObject element)
+            => (IList)element.GetValue(SelectedItemsProperty);
+
+        private static void OnSelectedItemsChanged(
+            DependencyObject d,
+            DependencyPropertyChangedEventArgs e)
+        {
+            if (d is ListBox listBox)
+            {
+                listBox.SelectionChanged -= ListBox_SelectionChanged;
+                listBox.SelectionChanged += ListBox_SelectionChanged;
+            }
+        }
+
+        private static void ListBox_SelectionChanged(
+            object sender,
+            SelectionChangedEventArgs e)
+        {
+            if (sender is ListBox listBox)
+            {
+                var boundList = GetSelectedItems(listBox);
+                if (boundList == null)
+                    return;
+
+                boundList.Clear();
+
+                foreach (var item in listBox.SelectedItems)
+                    boundList.Add(item);
+            }
+        }
+    }
+}

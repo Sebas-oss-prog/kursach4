@@ -1,0 +1,56 @@
+﻿<UserControl x:Class="WpfApp10.Views.SearchView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:viewmodels="clr-namespace:WpfApp10.ViewModels">
+
+    <UserControl.DataContext>
+        <viewmodels:SearchViewModel />
+    </UserControl.DataContext>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Заголовок -->
+        <TextBlock Text="Поиск"
+                   FontSize="28"
+                   FontWeight="Bold"
+                   Margin="0 0 0 20"
+                   Grid.Row="0"/>
+
+        <!-- Поле поиска -->
+        <TextBox Grid.Row="1"
+                 Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}"
+                 Margin="0 0 0 20"
+                 Padding="6"
+                 FontSize="16"
+                 VerticalContentAlignment="Center"
+                 Height="40"
+                 BorderThickness="1"
+                 BorderBrush="#CCC"/>
+
+        <!-- Результаты -->
+        <ListBox Grid.Row="2"
+                 ItemsSource="{Binding Results}"
+                 FontSize="16">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border BorderThickness="1"
+                            BorderBrush="#ccc"
+                            Padding="10"
+                            Margin="0 0 0 10"
+                            CornerRadius="6">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="18"/>
+                            <TextBlock Text="{Binding Type}" Foreground="Gray"/>
+                            <TextBlock Text="{Binding Info}" TextWrapping="Wrap" Margin="0 4 0 0"/>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</UserControl>
