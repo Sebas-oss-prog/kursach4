@@ -36,6 +36,10 @@ namespace WpfApp10.ViewModels
                 if (Set(ref _currentUser, value))
                 {
                     UserRole = value?.Role ?? "User";
+                    OnPropertyChanged(nameof(CanAdd));
+                    OnPropertyChanged(nameof(CanEdit));
+                    OnPropertyChanged(nameof(CanDelete));
+                    OnPropertyChanged(nameof(CanManageUsers));
                 }
             }
         }
@@ -51,6 +55,7 @@ namespace WpfApp10.ViewModels
                     OnPropertyChanged(nameof(CanAdd));
                     OnPropertyChanged(nameof(CanEdit));
                     OnPropertyChanged(nameof(CanDelete));
+                    OnPropertyChanged(nameof(CanManageUsers));
                 }
             }
         }
@@ -58,14 +63,16 @@ namespace WpfApp10.ViewModels
         // ================== PERMISSIONS ==================
         public bool CanAdd =>
             UserRole == "Admin" ||
-            UserRole == "Manager" ||
-            UserRole == "User";
+            UserRole == "Manager";
 
         public bool CanEdit =>
             UserRole == "Admin" ||
             UserRole == "Manager";
 
         public bool CanDelete =>
+            UserRole == "Admin";
+
+        public bool CanManageUsers =>
             UserRole == "Admin";
 
         // ================== VIEWMODELS ==================
@@ -79,10 +86,8 @@ namespace WpfApp10.ViewModels
         public RelayCommand NavigateNotifications { get; }
         public RelayCommand NavigateAnalytics { get; }
         public RelayCommand NavigateSearch { get; }
-
-        // 🔽 🔽 🔽 ДОБАВЛЕНО ДЛЯ КАЛЕНДАРЯ
         public RelayCommand NavigateCalendar { get; }
-
+        public RelayCommand NavigateUsers { get; }
         public RelayCommand LogoutCommand { get; }
 
         // ================== CONSTRUCTOR ==================
@@ -99,10 +104,8 @@ namespace WpfApp10.ViewModels
             NavigateNotifications = new RelayCommand(_ => OpenNotifications());
             NavigateAnalytics = new RelayCommand(_ => OpenAnalytics());
             NavigateSearch = new RelayCommand(_ => OpenSearch());
-
-            // 🔽 🔽 🔽 ИНИЦИАЛИЗАЦИЯ КОМАНДЫ КАЛЕНДАРЯ
             NavigateCalendar = new RelayCommand(_ => OpenCalendar());
-
+            NavigateUsers = new RelayCommand(_ => OpenUsers());
             LogoutCommand = new RelayCommand(_ => Logout());
 
             OpenDashboard();
@@ -178,12 +181,16 @@ namespace WpfApp10.ViewModels
             };
         }
 
-        // 🔽 🔽 🔽 МЕТОД ДЛЯ КАЛЕНДАРЯ (ДОБАВЛЕН)
         private void OpenCalendar()
         {
-            CurrentView = new CalendarView
+            CurrentView = new CalendarView();
+        }
+
+        private void OpenUsers()
+        {
+            CurrentView = new UsersView
             {
-                DataContext = new CalendarViewModel()
+                DataContext = new UsersViewModel()
             };
         }
 

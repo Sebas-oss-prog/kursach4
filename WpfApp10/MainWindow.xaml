@@ -8,8 +8,28 @@
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanResize">
 
-    <Grid>
+    <Window.Resources>
+        <Style x:Key="MenuButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="12 8"/>
+            <Setter Property="Margin" Value="0 5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#3E3E42"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#505050"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
 
+    <Grid>
         <!-- ================= ОСНОВНАЯ СЕТКА ================= -->
         <Grid>
             <Grid.ColumnDefinitions>
@@ -20,12 +40,9 @@
             <!-- ================= ЛЕВАЯ ПАНЕЛЬ ================= -->
             <Border Background="#2d2d30"
                     Grid.Column="0">
-
                 <DockPanel Margin="20">
-
                     <!-- ===== ВЕРХ (МЕНЮ) ===== -->
                     <StackPanel DockPanel.Dock="Top">
-
                         <TextBlock Text="Task Planner"
                                    Foreground="White"
                                    FontSize="28"
@@ -33,52 +50,50 @@
                                    Margin="0 0 0 20"/>
 
                         <Button Content="Dashboard"
-                                Height="40"
-                                Margin="0 5"
+                                Style="{StaticResource MenuButtonStyle}"
                                 Command="{Binding NavigateDashboard}"/>
 
                         <Button Content="Документы"
-                                Height="40"
-                                Margin="0 5"
+                                Style="{StaticResource MenuButtonStyle}"
                                 Command="{Binding NavigateDocuments}"/>
 
                         <Button Content="Задачи"
-                                Height="40"
-                                Margin="0 5"
+                                Style="{StaticResource MenuButtonStyle}"
                                 Command="{Binding NavigateTasks}"/>
 
                         <Button Content="Проекты"
-                                Height="40"
-                                Margin="0 5"
+                                Style="{StaticResource MenuButtonStyle}"
                                 Command="{Binding NavigateProjects}"/>
 
-                        <!-- 🆕 КАЛЕНДАРЬ -->
                         <Button Content="Календарь"
-                                Height="40"
-                                Margin="0 5"
+                                Style="{StaticResource MenuButtonStyle}"
                                 Command="{Binding NavigateCalendar}"/>
 
                         <Button Content="Аналитика"
-                                Height="40"
-                                Margin="0 5"
+                                Style="{StaticResource MenuButtonStyle}"
                                 Command="{Binding NavigateAnalytics}"/>
 
                         <Button Content="Уведомления"
-                                Height="40"
-                                Margin="0 5"
+                                Style="{StaticResource MenuButtonStyle}"
                                 Command="{Binding NavigateNotifications}"/>
 
+                        <!-- Кнопка управления пользователями (только для админа) -->
+                        <Button Content="Пользователи"
+                                Style="{StaticResource MenuButtonStyle}"
+                                Command="{Binding NavigateUsers}"
+                                Visibility="{Binding CanManageUsers, Converter={StaticResource BoolToVisibility}}"/>
                     </StackPanel>
 
                     <!-- ===== НИЗ (ПОЛЬЗОВАТЕЛЬ) ===== -->
                     <StackPanel DockPanel.Dock="Bottom"
                                 Margin="0 20 0 0">
-
-                        <Separator Margin="0 10"/>
+                        <Separator Margin="0 10"
+                                   Background="#404040"/>
 
                         <TextBlock Text="{Binding CurrentUser.FullName}"
                                    Foreground="White"
-                                   FontWeight="Bold"/>
+                                   FontWeight="Bold"
+                                   FontSize="14"/>
 
                         <TextBlock Text="{Binding UserRole}"
                                    Foreground="LightGray"
@@ -87,19 +102,43 @@
 
                         <Button Content="Выйти"
                                 Height="36"
-                                Command="{Binding LogoutCommand}"/>
-
+                                Background="#505050"
+                                Foreground="White"
+                                BorderThickness="0"
+                                Command="{Binding LogoutCommand}"
+                                Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}"
+                                                        CornerRadius="6">
+                                                    <ContentPresenter HorizontalAlignment="Center"
+                                                                      VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#606060"/>
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter Property="Background" Value="#707070"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
                     </StackPanel>
-
                 </DockPanel>
             </Border>
 
             <!-- ================= КОНТЕНТ ================= -->
             <Border Grid.Column="1"
                     Background="#f3f3f3">
-
                 <ContentControl Content="{Binding CurrentView}" />
-
             </Border>
         </Grid>
 
@@ -107,18 +146,14 @@
         <Grid Background="#80000000"
               Visibility="{Binding IsLoginVisible, Converter={StaticResource BoolToVisibility}}"
               Panel.ZIndex="999">
-
             <Border Width="420"
                     Padding="30"
                     Background="White"
                     CornerRadius="12"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center">
-
                 <views:LoginView DataContext="{Binding LoginVM}" />
-
             </Border>
         </Grid>
-
     </Grid>
 </Window>

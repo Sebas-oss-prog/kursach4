@@ -3,6 +3,39 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf">
 
+    <!-- ================= РЕСУРСЫ ================= -->
+    <UserControl.Resources>
+
+        <!-- КАРТОЧКА ДАШБОРДА -->
+        <Style x:Key="DashboardCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="Margin" Value="0 0 16 16"/>
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
+
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX="1.04" ScaleY="1.04"/>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+    </UserControl.Resources>
+
+    <!-- ================= ОСНОВНАЯ СЕТКА ================= -->
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -14,21 +47,19 @@
         <TextBlock Text="Главная"
                    FontSize="28"
                    FontWeight="Bold"
-                   Margin="0 0 0 15"/>
+                   Margin="0 0 0 20"/>
 
         <!-- ================= ПОИСК ================= -->
-        <StackPanel Grid.Row="1" Margin="0 0 0 20">
+        <StackPanel Grid.Row="1" Margin="0 0 0 25">
 
-            <!-- SEARCH BOX -->
             <Grid>
                 <TextBox Height="42"
                          FontSize="16"
                          Padding="14 6"
                          VerticalContentAlignment="Center"
                          Text="{Binding SearchText,
-                                UpdateSourceTrigger=PropertyChanged}" />
+                                UpdateSourceTrigger=PropertyChanged}"/>
 
-                <!-- PLACEHOLDER -->
                 <TextBlock Text="Поиск по задачам, проектам, документам..."
                            Margin="18 0 0 0"
                            VerticalAlignment="Center"
@@ -50,11 +81,11 @@
                 </TextBlock>
             </Grid>
 
-            <!-- SEARCH RESULTS -->
             <Border Margin="0 6 0 0"
                     BorderBrush="#DDD"
                     BorderThickness="1"
-                    CornerRadius="6"
+                    CornerRadius="8"
+                    Background="White"
                     Visibility="{Binding HasSearchResults,
                         Converter={StaticResource BoolToVisibility}}">
 
@@ -67,8 +98,8 @@
                         <DataTemplate>
                             <Border Margin="6"
                                     Padding="12"
-                                    CornerRadius="6"
-                                    BorderBrush="#DDD"
+                                    CornerRadius="8"
+                                    BorderBrush="#E0E0E0"
                                     BorderThickness="1"
                                     Background="White">
                                 <StackPanel>
@@ -86,7 +117,6 @@
 
                 </ListView>
             </Border>
-
         </StackPanel>
 
         <!-- ================= ОСНОВНОЙ КОНТЕНТ ================= -->
@@ -96,39 +126,54 @@
                 <ColumnDefinition Width="3*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- ===== СЧЁТЧИКИ ===== -->
+            <!-- ===== КАРТОЧКИ-СЧЁТЧИКИ ===== -->
             <WrapPanel Margin="0 0 20 0">
 
-                <Border Padding="20"
-                        Background="#F5F5F5"
-                        Margin="0 0 12 12"
-                        CornerRadius="6">
-                    <TextBlock Text="{Binding ProjectsCount,
-                        StringFormat=Проектов: {0}}"
-                               FontSize="20"/>
+                <Border Style="{StaticResource DashboardCardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="📁 Проекты"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding ProjectsCount}"
+                                   FontSize="36"
+                                   FontWeight="Bold"
+                                   Margin="0 10 0 0"/>
+                        <TextBlock Text="Всего проектов"
+                                   Opacity="0.6"/>
+                    </StackPanel>
                 </Border>
 
-                <Border Padding="20"
-                        Background="#F5F5F5"
-                        Margin="0 0 12 12"
-                        CornerRadius="6">
-                    <TextBlock Text="{Binding TasksCount,
-                        StringFormat=Задач: {0}}"
-                               FontSize="20"/>
+                <Border Style="{StaticResource DashboardCardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="✅ Задачи"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding TasksCount}"
+                                   FontSize="36"
+                                   FontWeight="Bold"
+                                   Margin="0 10 0 0"/>
+                        <TextBlock Text="Всего задач"
+                                   Opacity="0.6"/>
+                    </StackPanel>
                 </Border>
 
-                <Border Padding="20"
-                        Background="#F5F5F5"
-                        Margin="0 0 12 12"
-                        CornerRadius="6">
-                    <TextBlock Text="{Binding DocumentsCount,
-                        StringFormat=Документов: {0}}"
-                               FontSize="20"/>
+                <Border Style="{StaticResource DashboardCardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="📄 Документы"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding DocumentsCount}"
+                                   FontSize="36"
+                                   FontWeight="Bold"
+                                   Margin="0 10 0 0"/>
+                        <TextBlock Text="Всего документов"
+                                   Opacity="0.6"/>
+                    </StackPanel>
                 </Border>
 
             </WrapPanel>
 
-            <!-- ===== ДИАГРАММЫ ===== -->
+            <!-- ===== ГРАФИКИ ===== -->
             <StackPanel Grid.Column="1">
 
                 <TextBlock Text="Задачи по статусам"

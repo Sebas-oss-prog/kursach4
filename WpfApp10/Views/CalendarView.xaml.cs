@@ -10,26 +10,17 @@ namespace WpfApp10.Views
         public CalendarView()
         {
             InitializeComponent();
-        }
 
-        private CalendarViewModel VM => DataContext as CalendarViewModel;
-
-        private void PrevMonth_Click(object sender, System.Windows.RoutedEventArgs e)
-        {
-            VM?.PrevMonth();
-        }
-
-        private void NextMonth_Click(object sender, System.Windows.RoutedEventArgs e)
-        {
-            VM?.NextMonth();
+            DataContext = new CalendarViewModel();
         }
 
         private void Day_Click(object sender, MouseButtonEventArgs e)
         {
-            if (sender is Border border &&
-                border.DataContext is CalendarDayItem day)
+            if (DataContext is CalendarViewModel vm &&
+                sender is Border b &&
+                b.DataContext is CalendarDayItem day)
             {
-                VM?.DayClicked(day);
+                vm.SelectedDay = day;
             }
         }
     }

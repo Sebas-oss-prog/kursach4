@@ -6,180 +6,167 @@ namespace WpfApp10
 {
     public static class Database
     {
-        private static readonly string _dbPath = "taskplanner.db";
-        private static readonly string _connectionString =
+        private static readonly string DbPath = "taskplanner.db";
+        private static readonly string Cs =
             "Data Source=taskplanner.db;Version=3;foreign keys=true;";
 
         public static SQLiteConnection GetConnection()
-            => new SQLiteConnection(_connectionString);
+        {
+            return new SQLiteConnection(Cs);
+        }
 
         public static void Initialize()
         {
-            if (!File.Exists(_dbPath))
-                SQLiteConnection.CreateFile(_dbPath);
+            if (!File.Exists(DbPath))
+                SQLiteConnection.CreateFile(DbPath);
 
             CreateTables();
-            InsertUsers();
-            InsertEmployees();
             InsertTestData();
         }
 
-        // ================== TABLES ==================
         private static void CreateTables()
         {
-            Execute(@"
-CREATE TABLE IF NOT EXISTS Documents(
+            Exec(@"
+CREATE TABLE IF NOT EXISTS Users(
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
-    Title TEXT NOT NULL,
-    Type TEXT,
-    Author TEXT,
-    FilePath TEXT,
-    CreatedDate TEXT,
-    Deadline TEXT
+    Login TEXT UNIQUE,
+    Password TEXT,
+    Role TEXT,
+    FullName TEXT
 );");
 
-            Execute(@"
-CREATE TABLE IF NOT EXISTS Projects(
-    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-    Title TEXT NOT NULL,
-    Description TEXT,
-    Owner TEXT,
-    Deadline TEXT,
-    Progress INTEGER
-);");
-
-            Execute(@"
-CREATE TABLE IF NOT EXISTS Tasks(
-    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-    ProjectId INTEGER,
-    Title TEXT NOT NULL,
-    Description TEXT,
-    Status TEXT,
-    Priority TEXT,
-    Progress INTEGER,
-    Deadline TEXT,
-    FOREIGN KEY(ProjectId) REFERENCES Projects(Id) ON DELETE CASCADE
-);");
-
-            Execute(@"
+            Exec(@"
 CREATE TABLE IF NOT EXISTS Employees(
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
     FullName TEXT NOT NULL,
     Position TEXT
 );");
 
-            Execute(@"
+            Exec(@"
+CREATE TABLE IF NOT EXISTS Projects(
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Title TEXT,
+    Description TEXT,
+    Owner TEXT,
+    Deadline TEXT,
+    Progress INTEGER
+);");
+
+            Exec(@"
+CREATE TABLE IF NOT EXISTS Tasks(
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ProjectId INTEGER,
+    Title TEXT,
+    Description TEXT,
+    Status TEXT,
+    Priority TEXT,
+    Progress INTEGER,
+    Deadline TEXT
+);");
+
+            Exec(@"
 CREATE TABLE IF NOT EXISTS TaskEmployees(
     TaskId INTEGER,
     EmployeeId INTEGER,
-    PRIMARY KEY (TaskId, EmployeeId),
-    FOREIGN KEY(TaskId) REFERENCES Tasks(Id) ON DELETE CASCADE,
-    FOREIGN KEY(EmployeeId) REFERENCES Employees(Id) ON DELETE CASCADE
+    PRIMARY KEY(TaskId, EmployeeId)
 );");
 
-            Execute(@"
+            Exec(@"
+CREATE TABLE IF NOT EXISTS Documents(
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Title TEXT,
+    Type TEXT,
+    Author TEXT,
+    FilePath TEXT,
+    CreatedDate TEXT
+);");
+
+            Exec(@"
 CREATE TABLE IF NOT EXISTS Notifications(
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
     Message TEXT,
     Time TEXT
 );");
-
-            Execute(@"
-CREATE TABLE IF NOT EXISTS Users(
-    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-    Login TEXT NOT NULL UNIQUE,
-    Password TEXT NOT NULL,
-    Role TEXT NOT NULL,
-    FullName TEXT
-);");
         }
 
-        // ================== USERS ==================
-        private static void InsertUsers()
-        {
-            if (HasData("Users")) return;
-
-            Execute(@"
-INSERT INTO Users (Login,Password,Role,FullName) VALUES
-('admin','admin','Admin','Администратор'),
-('manager','manager','Manager','Менеджер'),
-('user','123','User','Пользователь');
-");
-        }
-
-        // ================== EMPLOYEES ==================
-        private static void InsertEmployees()
-        {
-            if (HasData("Employees")) return;
-
-            Execute(@"
-INSERT INTO Employees (FullName, Position) VALUES
-('Иванов И.И.', 'Backend'),
-('Петров П.П.', 'Frontend'),
-('Сидоров С.С.', 'Analyst'),
-('Кузнецов К.К.', 'Tester'),
-('Орлов О.О.', 'DevOps');
-");
-        }
-
-        // ================== TEST DATA ==================
         private static void InsertTestData()
-        {
-            if (HasData("Projects")) return;
-
-            // -------- PROJECTS --------
-            Execute(@"
-INSERT INTO Projects (Title, Description, Owner, Deadline, Progress) VALUES
-('CRM система','Разработка CRM','Иванов','2025-03-01',20),
-('Сайт компании','Редизайн сайта','Петров','2025-02-15',60),
-('Мобильное приложение','Приложение для клиентов','Орлов','2025-04-10',10),
-('Автоматизация отдела','Внутренняя система','Сидоров','2025-05-05',40),
-('Интеграция API','Связь с сервисами','Белов','2025-02-20',80);
-");
-
-            // -------- TASKS --------
-            Execute(@"
-INSERT INTO Tasks (ProjectId, Title, Description, Status, Priority, Progress, Deadline) VALUES
-(1,'Проектирование БД','Схема данных','В работе','Высокий',30,'2025-01-25'),
-(1,'API авторизации','JWT + роли','Не начато','Высокий',0,'2025-02-05'),
-(2,'Главная страница','UI и верстка','Завершена','Средний',100,'2025-01-10'),
-(3,'Push-уведомления','Firebase','В работе','Низкий',20,'2025-03-05'),
-(4,'Сбор требований','Интервью','Завершена','Высокий',100,'2025-01-15');
-");
-
-            // -------- DOCUMENTS --------
-            Execute(@"
-INSERT INTO Documents (Title, Type, Author, CreatedDate, Deadline) VALUES
-('Техническое задание','PDF','Иванов','2025-01-01','2025-01-10'),
-('Отчет по проекту','DOCX','Петров','2025-01-03','2025-01-20'),
-('График работ','XLSX','Сидоров','2025-01-05','2025-01-25'),
-('Финансовый отчет','PDF','Орлов','2025-01-07','2025-02-01'),
-('Презентация проекта','PPTX','Кузнецов','2025-01-09','2025-01-30');
-");
-
-            // -------- NOTIFICATIONS --------
-            Execute(@"
-INSERT INTO Notifications (Message, Time) VALUES
-('Проект CRM обновлен','2025-01-10'),
-('Задача завершена','2025-01-11'),
-('Добавлен документ','2025-01-12'),
-('Изменен срок проекта','2025-01-13'),
-('Создан новый пользователь','2025-01-14');
-");
-        }
-
-        // ================== HELPERS ==================
-        private static bool HasData(string table)
         {
             using (var con = GetConnection())
             {
                 con.Open();
-                var cmd = new SQLiteCommand($"SELECT COUNT(*) FROM {table}", con);
-                return Convert.ToInt32(cmd.ExecuteScalar()) > 0;
+
+                // 🔴 ВАЖНО: проверяем USERS, а не Tasks
+                var check = new SQLiteCommand("SELECT COUNT(*) FROM Users", con);
+                if ((long)check.ExecuteScalar() > 0)
+                    return;
             }
+
+            // ===== USERS =====
+            Exec(@"
+INSERT INTO Users (Login, Password, Role, FullName) VALUES
+('admin','admin','Admin','Администратор'),
+('ivan','123','Manager','Иванов И.И.'),
+('petr','123','Employee','Петров П.П.'),
+('sidor','123','Employee','Сидоров С.С.'),
+('guest','guest','Guest','Гость');
+");
+
+            // ===== EMPLOYEES =====
+            Exec(@"
+INSERT INTO Employees (FullName, Position) VALUES
+('Иванов И.И.','Backend'),
+('Петров П.П.','Frontend'),
+('Сидоров С.С.','Analyst'),
+('Орлов О.О.','DevOps'),
+('Кузнецов К.К.','Tester'),
+('Смирнов С.С.','Designer'),
+('Фёдоров Ф.Ф.','QA');
+");
+
+            // ===== PROJECTS =====
+            Exec(@"
+INSERT INTO Projects (Title, Description, Owner, Deadline, Progress) VALUES
+('CRM','Продажи','Иванов И.И.','2026-01-15',20),
+('Сайт','Корпоративный','Петров П.П.','2026-01-20',50),
+('Мобильное приложение','Android/iOS','Сидоров С.С.','2026-02-10',10);
+");
+
+            // ===== TASKS =====
+            Exec(@"
+INSERT INTO Tasks (ProjectId, Title, Description, Status, Priority, Progress, Deadline) VALUES
+(1,'Тест БД','Проверка SQLite','Новая','Высокий',0,'2026-01-15'),
+(1,'API','REST','В работе','Высокий',40,'2026-01-18'),
+(2,'Верстка','HTML/CSS','В работе','Средний',30,'2026-01-18'),
+(3,'Прототип','UI/UX','Новая','Низкий',0,'2026-02-01');
+");
+
+            // ===== TASK ↔ EMPLOYEES =====
+            Exec(@"
+INSERT INTO TaskEmployees (TaskId, EmployeeId) VALUES
+(1,1),
+(1,3),
+(2,1),
+(3,2),
+(4,3);
+");
+
+            // ===== DOCUMENTS =====
+            Exec(@"
+INSERT INTO Documents (Title, Type, Author, CreatedDate) VALUES
+('ТЗ','PDF','Иванов И.И.','2026-01-10'),
+('Макеты','Figma','Петров П.П.','2026-01-12'),
+('API Doc','DOCX','Сидоров С.С.','2026-01-15');
+");
+
+            // ===== NOTIFICATIONS =====
+            Exec(@"
+INSERT INTO Notifications (Message, Time) VALUES
+('Добавлена новая задача','2026-01-01 10:00'),
+('Проект CRM обновлён','2026-01-05 12:30');
+");
         }
 
-        private static void Execute(string sql)
+        private static void Exec(string sql)
         {
             using (var con = GetConnection())
             {

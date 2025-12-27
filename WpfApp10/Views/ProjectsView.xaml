@@ -6,11 +6,111 @@
     <UserControl.Resources>
         <helpers:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
         <helpers:NullToBoolConverter x:Key="NullToBool"/>
+
+        <!-- ===== СТИЛЬ КРЕСТИКА ===== -->
+        <Style x:Key="CloseButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="28"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Root"
+                                Width="28"
+                                Height="28"
+                                CornerRadius="14"
+                                Background="Transparent">
+                            <TextBlock Text="✕"
+                                       FontSize="14"
+                                       FontWeight="Bold"
+                                       Foreground="#555"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root"
+                                        Property="Background"
+                                        Value="#E0E0E0"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Root"
+                                        Property="Background"
+                                        Value="#D0D0D0"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ===== СТИЛЬ КНОПОК КАК В БОКОВОЙ ПАНЕЛИ ===== -->
+        <Style x:Key="SidePanelButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#333"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="12 8"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Left"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F0F0F0"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#E0E0E0"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль для кнопки Сохранить -->
+        <Style x:Key="SaveButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#4CAF50"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="14 8"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#45A049"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#3D8B40"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
 
     <Grid Margin="20">
 
-        <!-- ЛЕВАЯ ЧАСТЬ -->
+        <!-- ================== ЛЕВАЯ ЧАСТЬ ================== -->
         <StackPanel>
 
             <TextBlock Text="Проекты"
@@ -21,21 +121,34 @@
             <StackPanel Orientation="Horizontal" Margin="0 0 0 10">
                 <Button Content="Добавить"
                         Width="100"
-                        Command="{Binding AddCommand}"/>
+                        Style="{StaticResource SidePanelButtonStyle}"
+                        Command="{Binding AddCommand}"
+                        Visibility="{Binding DataContext.CanAdd, 
+                            RelativeSource={RelativeSource AncestorType=Window}, 
+                            Converter={StaticResource BoolToVisibility}}"/>
 
                 <Button Content="Редактировать"
                         Width="120"
                         Margin="10 0 0 0"
+                        Style="{StaticResource SidePanelButtonStyle}"
                         Command="{Binding EditCommand}"
-                        IsEnabled="{Binding SelectedProject, Converter={StaticResource NullToBool}}"/>
+                        IsEnabled="{Binding SelectedProject, Converter={StaticResource NullToBool}}"
+                        Visibility="{Binding DataContext.CanEdit, 
+                            RelativeSource={RelativeSource AncestorType=Window}, 
+                            Converter={StaticResource BoolToVisibility}}"/>
 
                 <Button Content="Удалить"
                         Width="100"
                         Margin="10 0 0 0"
+                        Style="{StaticResource SidePanelButtonStyle}"
                         Command="{Binding DeleteCommand}"
-                        IsEnabled="{Binding SelectedProject, Converter={StaticResource NullToBool}}"/>
+                        IsEnabled="{Binding SelectedProject, Converter={StaticResource NullToBool}}"
+                        Visibility="{Binding DataContext.CanDelete, 
+                            RelativeSource={RelativeSource AncestorType=Window}, 
+                            Converter={StaticResource BoolToVisibility}}"/>
             </StackPanel>
 
+            <!-- ===== СПИСОК ПРОЕКТОВ ===== -->
             <ListView ItemsSource="{Binding Projects}"
                       SelectedItem="{Binding SelectedProject}">
                 <ListView.ItemTemplate>
@@ -44,11 +157,36 @@
                                 BorderThickness="0 0 0 1"
                                 Padding="6">
                             <StackPanel>
+
+                                <!-- Название -->
                                 <TextBlock Text="{Binding Title}"
                                            FontWeight="Bold"/>
+
+                                <!-- Описание -->
                                 <TextBlock Text="{Binding Description}"
                                            Opacity="0.7"/>
-                                <TextBlock Text="{Binding Owner}"/>
+
+                                <!-- Владелец -->
+                                <TextBlock Text="{Binding Owner}"
+                                           FontStyle="Italic"/>
+
+                                <!-- ✅ УЧАСТНИКИ -->
+                                <ItemsControl ItemsSource="{Binding Members}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding FullName}"
+                                                       FontSize="11"
+                                                       Margin="10 0 0 0"
+                                                       Opacity="0.8"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <!-- Дедлайн -->
+                                <TextBlock Text="{Binding Deadline}"
+                                           FontSize="11"
+                                           Opacity="0.6"/>
+
                             </StackPanel>
                         </Border>
                     </DataTemplate>
@@ -56,13 +194,58 @@
             </ListView>
 
         </StackPanel>
-
-        <!-- ПРАВАЯ ПАНЕЛЬ -->
+        <!-- ================== ПРАВАЯ ПАНЕЛЬ ================== -->
         <Border Width="350"
                 Padding="20"
                 Background="#F4F4F4"
-                HorizontalAlignment="Right"
-                Visibility="{Binding IsEditorVisible, Converter={StaticResource BoolToVisibility}}">
+                HorizontalAlignment="Right">
+
+            <Border.RenderTransform>
+                <TranslateTransform X="360"/>
+            </Border.RenderTransform>
+
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Opacity" Value="0"/>
+                    <Setter Property="Visibility" Value="Collapsed"/>
+
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsEditorVisible}" Value="True">
+                            <Setter Property="Visibility" Value="Visible"/>
+
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetProperty="Opacity"
+                                            From="0" To="1"
+                                            Duration="0:0:0.25"/>
+                                        <DoubleAnimation
+                                            Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)"
+                                            From="360" To="0"
+                                            Duration="0:0:0.25"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+
+                            <DataTrigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="0"
+                                            Duration="0:0:0.2"/>
+                                        <DoubleAnimation
+                                            Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)"
+                                            To="360"
+                                            Duration="0:0:0.2"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.ExitActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
 
             <Grid>
                 <Grid.RowDefinitions>
@@ -70,19 +253,13 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <!-- КРЕСТИК -->
+                <!-- ===== КРЕСТИК ===== -->
                 <Button Grid.Row="0"
-                        Content="✕"
-                        Width="30"
-                        Height="30"
+                        Style="{StaticResource CloseButtonStyle}"
                         HorizontalAlignment="Right"
-                        VerticalAlignment="Top"
-                        Background="Transparent"
-                        BorderBrush="Transparent"
-                        FontSize="16"
                         Command="{Binding CloseCommand}"/>
 
-                <!-- КОНТЕНТ -->
+                <!-- ===== ФОРМА ===== -->
                 <StackPanel Grid.Row="1">
 
                     <TextBlock Text="{Binding PanelTitle}"
@@ -92,17 +269,30 @@
 
                     <TextBlock Text="Название"/>
                     <TextBox Text="{Binding SelectedProject.Title}"
-                             Margin="0 5 0 15"/>
+                             Margin="0 5 0 15"
+                             IsEnabled="{Binding DataContext.CanEdit, 
+                                RelativeSource={RelativeSource AncestorType=Window}}"/>
 
                     <TextBlock Text="Описание"/>
                     <TextBox Text="{Binding SelectedProject.Description}"
-                             Margin="0 5 0 15"/>
+                             Margin="0 5 0 15"
+                             IsEnabled="{Binding DataContext.CanEdit, 
+                                RelativeSource={RelativeSource AncestorType=Window}}"/>
 
                     <TextBlock Text="Владелец"/>
                     <ComboBox ItemsSource="{Binding Employees}"
                               SelectedItem="{Binding SelectedProject.OwnerEmployee}"
                               DisplayMemberPath="FullName"
-                              Margin="0 5 0 15"/>
+                              Margin="0 5 0 15"
+                              IsEnabled="{Binding DataContext.CanEdit, 
+                                RelativeSource={RelativeSource AncestorType=Window}}"/>
+
+                    <!-- ✅ ДЕДЛАЙН -->
+                    <TextBlock Text="Дедлайн"/>
+                    <DatePicker SelectedDate="{Binding SelectedProject.DeadlineDate}"
+                                Margin="0 5 0 15"
+                                IsEnabled="{Binding DataContext.CanEdit, 
+                                    RelativeSource={RelativeSource AncestorType=Window}}"/>
 
                     <TextBlock Text="Участники"/>
                     <ListBox ItemsSource="{Binding Employees}"
@@ -111,16 +301,21 @@
                              helpers:ListBoxSelectedItemsBehavior.SelectedItems=
                                  "{Binding SelectedProject.Members}"
                              Height="120"
-                             Margin="0 5 0 15"/>
+                             Margin="0 5 0 15"
+                             IsEnabled="{Binding DataContext.CanEdit, 
+                                RelativeSource={RelativeSource AncestorType=Window}}"/>
 
                     <Button Content="Сохранить"
-                            Height="35"
                             Width="200"
-                            Command="{Binding SaveCommand}"/>
+                            Height="35"
+                            Style="{StaticResource SaveButtonStyle}"
+                            Command="{Binding SaveCommand}"
+                            Visibility="{Binding DataContext.CanEdit, 
+                                RelativeSource={RelativeSource AncestorType=Window}, 
+                                Converter={StaticResource BoolToVisibility}}"/>
 
                 </StackPanel>
             </Grid>
         </Border>
-
     </Grid>
 </UserControl>

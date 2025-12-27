@@ -1,112 +1,110 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
-using System.Linq;
-using System.Windows;
+using WpfApp10.Helpers;
 using WpfApp10.Models;
 
 namespace WpfApp10.ViewModels
 {
     public class CalendarViewModel : BaseViewModel
     {
-        public ObservableCollection<CalendarDayItem> Days { get; private set; }
+        public ObservableCollection<CalendarDayItem> Days { get; }
+            = new ObservableCollection<CalendarDayItem>();
 
         private DateTime _currentMonth = DateTime.Today;
 
-        public string MonthTitle
+        private CalendarDayItem _selectedDay;
+        public CalendarDayItem SelectedDay
         {
-            get { return _currentMonth.ToString("MMMM yyyy", new CultureInfo("ru-RU")); }
+            get => _selectedDay;
+            set
+            {
+                Set(ref _selectedDay, value);
+                IsPanelVisible = value != null && value.HasAny;
+                OnPropertyChanged(nameof(SelectedDayTitle));
+            }
         }
 
-        // ===== ТЕСТОВЫЕ ДАННЫЕ =====
-        private readonly string[] _projects =
+        private bool _isPanelVisible;
+        public bool IsPanelVisible
         {
-            "Разработка CRM",
-            "Редизайн сайта",
-            "Мобильное приложение",
-            "Интеграция API",
-            "Автоматизация отдела"
-        };
+            get => _isPanelVisible;
+            set => Set(ref _isPanelVisible, value);
+        }
 
-        private readonly string[] _tasks =
-        {
-            "Проектирование БД",
-            "Разработка API",
-            "Верстка интерфейса",
-            "Написание тестов",
-            "Подготовка документации"
-        };
+        private static readonly CultureInfo Ru = new CultureInfo("ru-RU");
 
-        private readonly string[] _documents =
-        {
-            "Техническое задание",
-            "Отчет по проекту",
-            "График работ",
-            "Финансовый отчет",
-            "Презентация проекта"
-        };
+        public string MonthTitle =>
+            _currentMonth.ToString("MMMM yyyy", Ru);
+
+        public string SelectedDayTitle =>
+            SelectedDay?.Date.ToString("dd MMMM yyyy", Ru) ?? "";
+
+        public RelayCommand NextMonthCommand { get; }
+        public RelayCommand PrevMonthCommand { get; }
+        public RelayCommand ClosePanelCommand { get; }
 
         public CalendarViewModel()
         {
-            Days = new ObservableCollection<CalendarDayItem>();
+            NextMonthCommand = new RelayCommand(_ => ChangeMonth(1));
+            PrevMonthCommand = new RelayCommand(_ => ChangeMonth(-1));
+            ClosePanelCommand = new RelayCommand(_ => ClosePanel());
+
             GenerateMonth();
         }
 
-        public void NextMonth()
+        private void ChangeMonth(int delta)
         {
-            _currentMonth = _currentMonth.AddMonths(1);
+            _currentMonth = _currentMonth.AddMonths(delta);
             GenerateMonth();
+            OnPropertyChanged(nameof(MonthTitle));
         }
 
-        public void PrevMonth()
+        private void ClosePanel()
         {
-            _currentMonth = _currentMonth.AddMonths(-1);
-            GenerateMonth();
-        }
-
-        public void DayClicked(CalendarDayItem day)
-        {
-            if (day == null || !day.HasAny)
-                return;
-
-            string text =
-                "📅 " + day.Date.ToString("dd MMMM yyyy") + "\n\n" +
-                "Задачи:\n" + (day.Tasks.Any() ? string.Join("\n", day.Tasks) : "—") + "\n\n" +
-                "Проекты:\n" + (day.Projects.Any() ? string.Join("\n", day.Projects) : "—") + "\n\n" +
-                "Документы:\n" + (day.Documents.Any() ? string.Join("\n", day.Documents) : "—");
-
-            MessageBox.Show(text, "События дня");
+            SelectedDay = null;
+            IsPanelVisible = false;
         }
 
         private void GenerateMonth()
         {
             Days.Clear();
 
-            DateTime firstDay = new DateTime(_currentMonth.Year, _currentMonth.Month, 1);
+            var tasks = Repositories.GetTasks();
+            var projects = Repositories.GetProjects();
+            var documents = Repositories.GetDocuments();
+
+            var firstDay = new DateTime(_currentMonth.Year, _currentMonth.Month, 1);
             int daysInMonth = DateTime.DaysInMonth(_currentMonth.Year, _currentMonth.Month);
 
             for (int i = 0; i < daysInMonth; i++)
             {
-                DateTime date = firstDay.AddDays(i);
-                CalendarDayItem day = new CalendarDayItem();
-                day.Date = date;
+                var date = firstDay.AddDays(i);
+                var day = new CalendarDayItem { Date = date };
 
-                if (date.Day % 2 == 0)
-                    day.Tasks.Add(_tasks[date.Day % _tasks.Length]);
+                foreach (var task in tasks)
+                {
+                    var d = DateHelper.Parse(task.Deadline);
+                    if (d.HasValue && d.Value.Date == date.Date)
+                        day.Tasks.Add(task);
+                }
 
-                if (date.Day % 3 == 0)
-                    day.Tasks.Add(_tasks[(date.Day + 1) % _tasks.Length]);
+                foreach (var project in projects)
+                {
+                    var d = DateHelper.Parse(project.Deadline);
+                    if (d.HasValue && d.Value.Date == date.Date)
+                        day.Projects.Add(project);
+                }
 
-                if (date.Day % 5 == 0)
-                    day.Projects.Add(_projects[date.Day % _projects.Length]);
-
-                if (date.Day % 7 == 0)
-                    day.Documents.Add(_documents[date.Day % _documents.Length]);
+                foreach (var doc in documents)
+                {
+                    var d = DateHelper.Parse(doc.CreatedDate);
+                    if (d.HasValue && d.Value.Date == date.Date)
+                        day.Documents.Add(doc);
+                }
 
                 Days.Add(day);
             }
-
-            OnPropertyChanged("MonthTitle");
         }
     }
 }

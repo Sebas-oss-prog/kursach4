@@ -3,19 +3,80 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf">
 
-    <Grid Background="#F5F5F5" Margin="20">
+    <UserControl.Resources>
+        <!-- ===== СТИЛЬ КНОПОК КАК В БОКОВОЙ ПАНЕЛИ ===== -->
+        <Style x:Key="AnalyticsButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#333"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#DDD"/>
+            <Setter Property="Padding" Value="12 8"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F0F0F0"/>
+                    <Setter Property="BorderBrush" Value="#CCC"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#E0E0E0"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
 
+        <!-- Стиль для кнопки Экспорт в Excel -->
+        <Style x:Key="ExportButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#2196F3"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="14 8"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#1976D2"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#1565C0"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="#F5F5F5" Margin="20">
         <Border Background="White"
                 CornerRadius="10"
                 Padding="20">
-
             <StackPanel>
-
                 <!-- ЗАГОЛОВОК -->
                 <TextBlock Text="Аналитика системы"
                            FontSize="26"
                            FontWeight="Bold"/>
-
                 <TextBlock Text="Проекты, задачи и документы"
                            Foreground="Gray"
                            Margin="0 0 0 15"/>
@@ -23,36 +84,35 @@
                 <!-- КНОПКИ -->
                 <StackPanel Orientation="Horizontal"
                             Margin="0 0 0 15">
-
                     <Button Content="Год"
                             Width="90"
+                            Style="{StaticResource AnalyticsButtonStyle}"
                             Margin="0 0 10 0"
                             Command="{Binding ShowYearCommand}"/>
 
                     <Button Content="Месяц"
                             Width="90"
+                            Style="{StaticResource AnalyticsButtonStyle}"
                             Margin="0 0 10 0"
                             Command="{Binding ShowMonthCommand}"/>
 
                     <Button Content="Сегодня"
                             Width="90"
+                            Style="{StaticResource AnalyticsButtonStyle}"
                             Margin="0 0 20 0"
                             Command="{Binding ShowTodayCommand}"/>
 
                     <Button Content="Экспорт в Excel"
                             Width="160"
+                            Style="{StaticResource ExportButtonStyle}"
                             Command="{Binding ExportExcelCommand}"/>
-
                 </StackPanel>
 
-                <!-- ГРАФИК (БЕЗ AXIS!) -->
+                <!-- ГРАФИК -->
                 <lvc:CartesianChart Series="{Binding SeriesCollection}"
                                     LegendLocation="Right"
                                     Height="400"/>
-
             </StackPanel>
-
         </Border>
-
     </Grid>
 </UserControl>

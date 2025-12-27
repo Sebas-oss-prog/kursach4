@@ -115,7 +115,9 @@
     <Compile Include="AppState.cs" />
     <Compile Include="Data\Database.cs" />
     <Compile Include="Data\Repositories.cs" />
+    <Compile Include="Helpers\BooleanNegationConverter.cs" />
     <Compile Include="Helpers\BoolToVisibilityConverter.cs" />
+    <Compile Include="Helpers\DateHelper.cs" />
     <Compile Include="Helpers\ListBoxSelectedItemsBehavior.cs" />
     <Compile Include="Helpers\NullToBoolConverter.cs" />
     <Compile Include="Helpers\RelayCommand.cs" />
@@ -140,6 +142,7 @@
     <Compile Include="ViewModels\SearchResultItem.cs" />
     <Compile Include="ViewModels\SearchViewModel.cs" />
     <Compile Include="ViewModels\TasksViewModel.cs" />
+    <Compile Include="ViewModels\UsersViewModel.cs" />
     <Compile Include="Views\AnalyticsView.xaml.cs">
       <DependentUpon>AnalyticsView.xaml</DependentUpon>
     </Compile>
@@ -166,6 +169,9 @@
     </Compile>
     <Compile Include="Views\TasksView.xaml.cs">
       <DependentUpon>TasksView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UsersView.xaml.cs">
+      <DependentUpon>UsersView.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -212,6 +218,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\TasksView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\UsersView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,42 +1,26 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Windows.Media;
+using WpfApp10.Models;
 
-namespace WpfApp10.Models
+public class CalendarDayItem
 {
-    public class CalendarDayItem
-    {
-        public DateTime Date { get; set; }
+    public DateTime Date { get; set; }
 
-        public int Day => Date.Day;
+    public int Day => Date.Day;
 
-        public ObservableCollection<string> Tasks { get; }
-        public ObservableCollection<string> Projects { get; }
-        public ObservableCollection<string> Documents { get; }
+    // 🔴 БЫЛО: string
+    // 🔵 СТАЛО: TaskModel
+    public ObservableCollection<TaskModel> Tasks { get; }
+        = new ObservableCollection<TaskModel>();
 
-        public bool HasTasks => Tasks.Count > 0;
-        public bool HasProjects => Projects.Count > 0;
-        public bool HasDocuments => Documents.Count > 0;
+    public ObservableCollection<ProjectModel> Projects { get; }
+        = new ObservableCollection<ProjectModel>();
 
-        public bool HasAny => HasTasks || HasProjects || HasDocuments;
+    public ObservableCollection<DocumentModel> Documents { get; }
+        = new ObservableCollection<DocumentModel>();
 
-        // 🎨 Цвет точки
-        public Brush DotColor
-        {
-            get
-            {
-                if (HasProjects) return Brushes.MediumPurple;
-                if (HasTasks) return Brushes.DodgerBlue;
-                if (HasDocuments) return Brushes.SeaGreen;
-                return Brushes.Transparent;
-            }
-        }
-
-        public CalendarDayItem()
-        {
-            Tasks = new ObservableCollection<string>();
-            Projects = new ObservableCollection<string>();
-            Documents = new ObservableCollection<string>();
-        }
-    }
+    public bool HasAny =>
+        Tasks.Count > 0 ||
+        Projects.Count > 0 ||
+        Documents.Count > 0;
 }
